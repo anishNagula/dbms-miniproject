@@ -5,9 +5,10 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProjectDetailsPage from './pages/ProjectDetailsPage';
-import CreateProjectPage from './pages/CreateProjectPage'; // <-- IMPORT
-import DashboardPage from './pages/DashboardPage';       // <-- IMPORT
+import CreateProjectPage from './pages/CreateProjectPage';
+import DashboardPage from './pages/DashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminDashboardPage from './pages/AdminDashboardPage'; // <-- IMPORT
 
 function App() {
   return (
@@ -29,6 +30,11 @@ function App() {
           <Route
             path="/create-project"
             element={<ProtectedRoute><CreateProjectPage /></ProtectedRoute>}
+          />
+          {/* Admin Route */}
+          <Route
+            path="/admin/dashboard"
+            element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>}
           />
         </Routes>
       </main>

@@ -282,13 +282,37 @@ const deleteProject = async (req, res) => {
     }
 };
 
+const deleteProjectAsAdmin = async (req, res) => {
+  const project_id = req.params.id;
+
+  try {
+      // Because this is an admin route, we don't need to check for ownership.
+      // We just check if the project exists before deleting.
+      const [project] = await pool.query('SELECT * FROM Project WHERE project_id = ?', [project_id]);
+
+      if (project.length === 0) {
+          return res.status(404).json({ message: 'Project not found.' });
+      }
+
+      // Delete the project
+      await pool.query('DELETE FROM Project WHERE project_id = ?', [project_id]);
+
+      res.status(200).json({ message: 'Project deleted successfully by admin.' });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error while deleting project.' });
+  }
+};
+
 module.exports = {
-    getAllProjects,
-    getProjectById,
-    createProject,
-    updateProject,      // <-- ADD THIS
-    deleteProject,      // <-- AND THIS
-    applyToProject,
-    getProjectApplications,
-    acceptApplication,
-  };
+  getAllProjects,
+  getProjectById,
+  createProject,
+  updateProject,
+  deleteProject,
+  applyToProject,
+  getProjectApplications,
+  acceptApplication,
+  deleteProjectAsAdmin, // <-- ADD THIS LINE
+};

@@ -21,7 +21,15 @@ const Navbar = () => {
         {user ? (
           <>
             <span>Welcome, {user.f_name}!</span>
-            <Link to="/create-project">Create Project</Link> {/* <-- ADDED LINK */}
+            
+            {/* THIS IS THE MISSING PART */}
+            {user.role === 'admin' && (
+              <Link to="/admin/dashboard" style={{ color: '#ffc107', fontWeight: 'bold' }}>
+                Admin Panel
+              </Link>
+            )}
+
+            <Link to="/create-project">Create Project</Link>
             <Link to="/dashboard">Dashboard</Link>
             <button onClick={handleLogout} className="logout-button">Logout</button>
           </>

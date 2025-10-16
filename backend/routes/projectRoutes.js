@@ -1,17 +1,19 @@
-// In /server/routes/projectRoutes.js
 const express = require('express');
 const router = express.Router();
 const { 
   createProject, 
   getAllProjects, 
   getProjectById, 
-  updateProject,      // <-- NEW
-  deleteProject,      // <-- NEW
+  updateProject,
+  deleteProject,
   applyToProject, 
   getProjectApplications, 
-  acceptApplication 
+  acceptApplication,
+  deleteProjectAsAdmin // <-- IMPORT
 } = require('../controllers/projectController.js');
+
 const { protect } = require('../middleware/authMiddleware.js');
+const { admin } = require('../middleware/adminMiddleware.js'); // <-- IMPORT
 
 // Public routes
 router.get('/', getAllProjects);
@@ -19,12 +21,15 @@ router.get('/:id', getProjectById);
 
 // Protected routes (require a valid token)
 router.post('/', protect, createProject);
-router.put('/:id', protect, updateProject);      // <-- NEW
-router.delete('/:id', protect, deleteProject);  // <-- NEW
+router.put('/:id', protect, updateProject);
+router.delete('/:id', protect, deleteProject);
 
 // Application management routes
 router.post('/:id/apply', protect, applyToProject);
 router.get('/:id/applications', protect, getProjectApplications);
 router.post('/applications/accept', protect, acceptApplication);
+
+// Admin-only routes
+router.delete('/admin/:id', protect, admin, deleteProjectAsAdmin); // <-- THIS IS THE NEW ROUTE
 
 module.exports = router;

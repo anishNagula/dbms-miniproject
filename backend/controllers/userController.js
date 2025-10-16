@@ -33,7 +33,7 @@ const registerUser = async (req, res) => {
     const newUserId = result.insertId;
 
     // Generate JWT
-    const token = jwt.sign({ id: newUserId }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: newUserId, role: 'student' }, process.env.JWT_SECRET, {
       expiresIn: '30d',
     });
 
@@ -42,6 +42,7 @@ const registerUser = async (req, res) => {
       f_name,
       l_name,
       email,
+      role: 'student', // <-- ADDED ROLE
       token,
     });
   } catch (error) {
@@ -67,15 +68,14 @@ const loginUser = async (req, res) => {
 
     if (user && (await bcrypt.compare(password, user.password_hash))) {
       // Passwords match, generate token
-      const token = jwt.sign({ id: user.student_id }, process.env.JWT_SECRET, {
-        expiresIn: '30d',
-      });
+      const token = jwt.sign({ id: user.student_id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
       res.status(200).json({
         student_id: user.student_id,
         f_name: user.f_name,
         l_name: user.l_name,
         email: user.email,
+        role: user.role, // <-- ADDED ROLE
         token,
       });
     } else {
@@ -98,8 +98,22 @@ const getUserProfile = async (req, res) => {
   res.status(200).json(req.user);
 };
 
+// @desc    Get all users (Admin only)
+// @route   GET /api/users
+// @access  Private/Admin
+const getAllUsers = async (req, res) => {
+  try {
+    const [users] = await pool.query('SELECT student_id, f_name, l_name, email, role FROM Student ORDER BY f_name');
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error fetching users' });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getUserProfile,
+  getAllUsers,
 };

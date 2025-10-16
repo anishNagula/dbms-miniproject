@@ -15,8 +15,8 @@ const protect = async (req, res, next) => {
 
       // Get user from the DB using the ID in the token
       const [rows] = await pool.query(
-        'SELECT student_id, email, f_name, l_name FROM Student WHERE student_id = ?',
-        [decoded.id]
+        'SELECT student_id, email, f_name, l_name, role FROM Student WHERE student_id = ?',
+         [decoded.id]
       );
       
       if (rows.length === 0) {
