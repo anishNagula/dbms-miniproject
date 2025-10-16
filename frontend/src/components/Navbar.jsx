@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import './Navbar.css'; // We'll create this CSS file next
+import './Navbar.css';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -21,6 +21,7 @@ const Navbar = () => {
         {user ? (
           <>
             <span>Welcome, {user.f_name}!</span>
+            <Link to="/create-project">Create Project</Link> {/* <-- ADDED LINK */}
             <Link to="/dashboard">Dashboard</Link>
             <button onClick={handleLogout} className="logout-button">Logout</button>
           </>

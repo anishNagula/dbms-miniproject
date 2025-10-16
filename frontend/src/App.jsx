@@ -5,10 +5,9 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProjectDetailsPage from './pages/ProjectDetailsPage';
+import CreateProjectPage from './pages/CreateProjectPage'; // <-- IMPORT
+import DashboardPage from './pages/DashboardPage';       // <-- IMPORT
 import ProtectedRoute from './components/ProtectedRoute';
-
-// Simple placeholder for now
-const DashboardPage = () => <div className="page-container"><h3>Dashboard</h3><p>Your projects and applications will appear here.</p></div>;
 
 function App() {
   return (
@@ -25,11 +24,11 @@ function App() {
           {/* Protected Routes */}
           <Route
             path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
+            element={<ProtectedRoute><DashboardPage /></ProtectedRoute>}
+          />
+          <Route
+            path="/create-project"
+            element={<ProtectedRoute><CreateProjectPage /></ProtectedRoute>}
           />
         </Routes>
       </main>
