@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
+import TeamChat from '../components/TeamChat';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
 
 const ProjectDetailsPage = () => {
@@ -12,6 +13,7 @@ const ProjectDetailsPage = () => {
   const [message, setMessage] = useState(''); // For success/error messages
   const { user } = useAuth(); // Get the current logged-in user
   const isOwner = user && project && user.student_id === project.created_student_id;
+  const isTeamMember = isOwner || (user && project?.teamMembers.some(member => member.student_id === user.student_id));
 
   useEffect(() => {
     const fetchProjectDetails = async () => {
@@ -43,7 +45,7 @@ const ProjectDetailsPage = () => {
   if (!project) return <p>Project not found.</p>;
 
   // Determine if the "Apply" button should be shown
-  const canApply = user && user.student_id !== project.created_student_id;
+  const canApply = user && !isOwner && !isTeamMember;
 
   return (
     <div className="page-container">
@@ -89,6 +91,13 @@ const ProjectDetailsPage = () => {
           ))}
         </ul>
       ) : <p>No team members yet.</p>}
+      
+      <hr style={{ margin: '2rem 0' }} />
+      {isTeamMember ? (
+        <TeamChat projectId={id} />
+      ) : (
+        <p>You must be a member of the project team to view the chat.</p>
+      )}
     </div>
   );
 };
