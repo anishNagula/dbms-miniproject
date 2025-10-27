@@ -12,11 +12,11 @@ const {
   deleteProjectAsAdmin // <-- IMPORT
 } = require('../controllers/projectController.js');
 
-const { protect } = require('../middleware/authMiddleware.js');
+const { protect, identifyUser } = require('../middleware/authMiddleware.js');
 const { admin } = require('../middleware/adminMiddleware.js'); // <-- IMPORT
 
 // Public routes
-router.get('/', getAllProjects);
+router.get('/', identifyUser, getAllProjects);
 router.get('/:id', getProjectById);
 
 // Protected routes (require a valid token)

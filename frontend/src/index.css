@@ -48,3 +48,43 @@ button {
 button:hover {
   background-color: #0056b3;
 }
+
+/* Dashboard Page Enhancements */
+.dashboard-card {
+  margin-bottom: 2rem;
+  background: #fff;
+  padding: 1.5rem;
+}
+
+.project-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.project-card-link .dashboard-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+  transition: all 0.2s ease;
+}
+
+.application-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.application-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.application-item span {
+  font-size: 0.95rem;
+}
+
+.application-item button {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+}

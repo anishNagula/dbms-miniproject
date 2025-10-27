@@ -8,7 +8,9 @@ import ProjectDetailsPage from './pages/ProjectDetailsPage';
 import CreateProjectPage from './pages/CreateProjectPage';
 import DashboardPage from './pages/DashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
-import AdminDashboardPage from './pages/AdminDashboardPage'; // <-- IMPORT
+import AdminDashboardPage from './pages/AdminDashboardPage';
+import ProfilePage from './pages/ProfilePage';
+import EditProjectPage from './pages/EditProjectPage';
 
 function App() {
   return (
@@ -30,6 +32,14 @@ function App() {
           <Route
             path="/create-project"
             element={<ProtectedRoute><CreateProjectPage /></ProtectedRoute>}
+          />
+          <Route
+            path="/profile"
+            element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
+          />
+          <Route
+            path="/projects/:id/edit"
+            element={<ProtectedRoute><EditProjectPage /></ProtectedRoute>}
           />
           {/* Admin Route */}
           <Route

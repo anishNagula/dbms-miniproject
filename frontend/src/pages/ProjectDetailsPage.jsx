@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
@@ -11,6 +11,7 @@ const ProjectDetailsPage = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState(''); // For success/error messages
   const { user } = useAuth(); // Get the current logged-in user
+  const isOwner = user && project && user.student_id === project.created_student_id;
 
   useEffect(() => {
     const fetchProjectDetails = async () => {
@@ -52,6 +53,15 @@ const ProjectDetailsPage = () => {
           Apply to this Project
         </button>
       )}
+
+      {isOwner && (
+          <Link to={`/projects/${id}/edit`}>
+            <button style={{ marginBottom: '1rem', backgroundColor: '#ffc107' }}>
+              Edit Project
+            </button>
+          </Link>
+        )}
+
       {message && <p style={{ color: message.includes('successfully') ? 'green' : 'red' }}>{message}</p>}
       
       <p><strong>Status:</strong> {project.status_name}</p>

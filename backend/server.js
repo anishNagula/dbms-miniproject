@@ -7,6 +7,7 @@ require('dotenv').config();
 const userRoutes = require('./routes/userRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const communicationRoutes = require('./routes/communicationRoutes');
+const skillRoutes = require('./routes/skillRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,6 +20,7 @@ app.use(express.json()); // Parses incoming JSON requests
 app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/communication', communicationRoutes);
+app.use('/api/skills', skillRoutes);
 
 app.listen(PORT, () => {
   console.log(`✅ Server is running beautifully on port ${PORT}`);

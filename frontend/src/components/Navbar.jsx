@@ -29,6 +29,7 @@ const Navbar = () => {
               </Link>
             )}
 
+            <Link to="/profile">My Profile</Link>
             <Link to="/create-project">Create Project</Link>
             <Link to="/dashboard">Dashboard</Link>
             <button onClick={handleLogout} className="logout-button">Logout</button>

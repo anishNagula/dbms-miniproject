@@ -111,9 +111,125 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+// @desc    Get a user's own skills
+// @route   GET /api/users/profile/skills
+// @access  Private
+const getUserSkills = async (req, res) => {
+  const student_id = req.user.student_id;
+  try {
+    const query = `
+      SELECT s.skill_id, s.skill_name, ss.proficiency 
+      FROM Student_Skills AS ss
+      JOIN Skills AS s ON ss.skill_id = s.skill_id
+      WHERE ss.student_id = ?;
+    `;
+    const [skills] = await pool.query(query, [student_id]);
+    res.status(200).json(skills);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error fetching user skills' });
+  }
+};
+
+// @desc    Add a skill to a user's profile
+// @route   POST /api/users/profile/skills
+// @access  Private
+const addUserSkill = async (req, res) => {
+  const student_id = req.user.student_id;
+  const { skill_id, proficiency } = req.body;
+
+  if (!skill_id || !proficiency) {
+    return res.status(400).json({ message: 'Skill ID and proficiency are required' });
+  }
+
+  try {
+    await pool.query(
+      'INSERT INTO Student_Skills (student_id, skill_id, proficiency) VALUES (?, ?, ?)',
+      [student_id, skill_id, proficiency]
+    );
+    res.status(201).json({ message: 'Skill added successfully' });
+  } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({ message: 'You already have this skill' });
+    }
+    console.error(error);
+    res.status(500).json({ message: 'Server error adding skill' });
+  }
+};
+
+// @desc    Remove a skill from a user's profile
+// @route   DELETE /api/users/profile/skills/:skillId
+// @access  Private
+const removeUserSkill = async (req, res) => {
+  const student_id = req.user.student_id;
+  const { skillId } = req.params;
+
+  try {
+    await pool.query(
+      'DELETE FROM Student_Skills WHERE student_id = ? AND skill_id = ?',
+      [student_id, skillId]
+    );
+    res.status(200).json({ message: 'Skill removed successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error removing skill' });
+  }
+};
+
+
+// @desc    Get all projects created by the logged-in user
+// @route   GET /api/users/projects/created
+// @access  Private
+const getMyCreatedProjects = async (req, res) => {
+  try {
+    // This query is from your old AdminDashboard, but filtered for the current user
+    const query = `
+      SELECT p.project_id, p.title, p.description, ps.status_name, s.f_name AS creator_fname, s.l_name AS creator_lname
+      FROM Project AS p
+      JOIN Project_Status AS ps ON p.status_id = ps.status_id
+      JOIN Student AS s ON p.created_student_id = s.student_id
+      WHERE p.created_student_id = ?
+      ORDER BY p.created_at DESC;
+    `;
+    const [projects] = await pool.query(query, [req.user.student_id]);
+    res.status(200).json(projects);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error fetching created projects' });
+  }
+};
+
+// @desc    Get all projects the logged-in user is participating in
+// @route   GET /api/users/projects/participating
+// @access  Private
+const getMyParticipatingProjects = async (req, res) => {
+  try {
+    const query = `
+      SELECT p.project_id, p.title, p.description, ps.status_name, s.f_name AS creator_fname, s.l_name AS creator_lname
+      FROM Project AS p
+      JOIN Project_Status AS ps ON p.status_id = ps.status_id
+      JOIN Student AS s ON p.created_student_id = s.student_id
+      JOIN Project_Team AS pt ON p.project_id = pt.project_id
+      WHERE pt.student_id = ? AND p.created_student_id != ?
+      ORDER BY p.created_at DESC;
+    `;
+    const [projects] = await pool.query(query, [req.user.student_id, req.user.student_id]);
+    res.status(200).json(projects);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error fetching participating projects' });
+  }
+};
+
+
 module.exports = {
   registerUser,
   loginUser,
   getUserProfile,
   getAllUsers,
+  getUserSkills,
+  addUserSkill,
+  removeUserSkill,
+  getMyCreatedProjects,
+  getMyParticipatingProjects,
 };

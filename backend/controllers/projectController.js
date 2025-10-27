@@ -7,18 +7,47 @@ const pool = require('../config/db');
 // @access  Public
 const getAllProjects = async (req, res) => {
   try {
-    const query = `
-      SELECT 
-        p.project_id, p.title, p.description, p.created_at,
-        ps.status_name,
-        s.f_name AS creator_fname, s.l_name AS creator_lname
-      FROM Project AS p
-      JOIN Project_Status AS ps ON p.status_id = ps.status_id
-      JOIN Student AS s ON p.created_student_id = s.student_id
-      ORDER BY p.created_at DESC;
-    `;
-    const [projects] = await pool.query(query);
+    let query;
+    let queryParams = [];
+
+    if (req.user) {
+      // USER IS LOGGED IN
+      // Fetch projects that the user has NOT applied to AND is NOT a team member of.
+      query = `
+        SELECT 
+          p.project_id, p.title, p.description, p.created_at,
+          ps.status_name,
+          s.f_name AS creator_fname, s.l_name AS creator_lname
+        FROM Project AS p
+        JOIN Project_Status AS ps ON p.status_id = ps.status_id
+        JOIN Student AS s ON p.created_student_id = s.student_id
+        WHERE p.project_id NOT IN (
+          SELECT project_id FROM Project_Application WHERE student_id = ?
+        )
+        AND p.project_id NOT IN (
+          SELECT project_id FROM Project_Team WHERE student_id = ?
+        )
+        ORDER BY p.created_at DESC;
+      `;
+      queryParams = [req.user.student_id, req.user.student_id];
+    } else {
+      // USER IS A GUEST
+      // Fetch all projects normally.
+      query = `
+        SELECT 
+          p.project_id, p.title, p.description, p.created_at,
+          ps.status_name,
+          s.f_name AS creator_fname, s.l_name AS creator_lname
+        FROM Project AS p
+        JOIN Project_Status AS ps ON p.status_id = ps.status_id
+        JOIN Student AS s ON p.created_student_id = s.student_id
+        ORDER BY p.created_at DESC;
+      `;
+    }
+
+    const [projects] = await pool.query(query, queryParams);
     res.status(200).json(projects);
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error fetching projects' });
@@ -224,33 +253,37 @@ const acceptApplication = async (req, res) => {
 // @route   PUT /api/projects/:id
 // @access  Private (Owner only)
 const updateProject = async (req, res) => {
-    const { title, description, status_id, reference_link } = req.body;
-    const project_id = req.params.id;
-    const user_id = req.user.student_id;
+  const { title, description, status_id } = req.body;
+  const project_id = req.params.id;
+  const user_id = req.user.student_id;
 
-    try {
-        // First, verify the user owns the project
-        const [projectOwner] = await pool.query('SELECT created_student_id FROM Project WHERE project_id = ?', [project_id]);
+  if (!title || !description || !status_id) {
+      return res.status(400).json({ message: 'Title, description, and status are required.' });
+  }
 
-        if (projectOwner.length === 0) {
-            return res.status(404).json({ message: 'Project not found.' });
-        }
-        if (projectOwner[0].created_student_id !== user_id) {
-            return res.status(403).json({ message: 'Forbidden: You are not the owner of this project.' });
-        }
+  try {
+      // First, verify the user owns the project
+      const [projectOwner] = await pool.query('SELECT created_student_id FROM Project WHERE project_id = ?', [project_id]);
 
-        // Update the project in the database
-        await pool.query(
-            'UPDATE Project SET title = ?, description = ?, status_id = ?, reference_link = ? WHERE project_id = ?',
-            [title, description, status_id, reference_link, project_id]
-        );
+      if (projectOwner.length === 0) {
+          return res.status(404).json({ message: 'Project not found.' });
+      }
+      if (projectOwner[0].created_student_id !== user_id) {
+          return res.status(403).json({ message: 'Forbidden: You are not the owner of this project.' });
+      }
 
-        res.status(200).json({ message: 'Project updated successfully.' });
+      // User is the owner, proceed with update
+      await pool.query(
+          'UPDATE Project SET title = ?, description = ?, status_id = ? WHERE project_id = ?',
+          [title, description, status_id, project_id]
+      );
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error while updating project.' });
-    }
+      res.status(200).json({ message: 'Project updated successfully.' });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error while updating project.' });
+  }
 };
 
 // @desc    Delete a project
