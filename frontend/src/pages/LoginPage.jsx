@@ -21,7 +21,7 @@ const LoginPage = () => {
       login(response.data); // Use the login function from context
       navigate('/'); // Redirect to homepage on successful login
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      setError(err.response?.data?.message || 'Login failed. Please check your entered credentials.');
     }
   };
 
