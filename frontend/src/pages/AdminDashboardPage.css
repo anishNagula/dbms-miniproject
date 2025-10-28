@@ -1,0 +1,68 @@
+/* AdminDashboardPage.css */
+
+/* Add spacing between the dashboard sections */
+.admin-dashboard-section {
+    margin-top: 2.5rem;
+  }
+  
+  .admin-dashboard-section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Container for the user list */
+  .user-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  /* Individual user item */
+  .user-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* For smaller screens */
+    gap: 1rem;
+    background-color: var(--card);
+    padding: 1rem 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  
+  .user-list-item-info {
+    font-size: 0.95rem;
+    color: var(--foreground);
+  }
+  
+  .user-list-item-info span {
+    color: var(--muted-foreground);
+  }
+  
+  .user-list-item-role {
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius);
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+  }
+  
+  /* Container for the project list */
+  .admin-project-list {
+    display: grid;
+    grid-template-columns: 1fr; /* 1 column by default */
+    gap: 1.5rem;
+  }
+  
+  /* On wider screens, show 2 columns */
+  @media (min-width: 768px) {
+    .admin-project-list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }

@@ -1,0 +1,77 @@
+/* ProfilePage.css */
+
+.profile-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    margin-top: 2.5rem; /* Add space between sections */
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.75rem;
+  }
+  
+  /* No top margin for the user's name (the first h3) */
+  .profile-card h3:first-of-type {
+    margin-top: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  
+  .profile-card .user-info p {
+    color: var(--foreground);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  
+  .profile-card .user-info p strong {
+    color: var(--muted-foreground);
+    font-weight: 500;
+    margin-right: 0.5rem;
+  }
+  
+  /* The skills list */
+  .skills-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .skill-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .skill-item:last-child {
+    border-bottom: none;
+  }
+  
+  .skill-item span {
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  
+  /* The form to add a new skill */
+  .add-skill-form {
+    margin-top: 1rem;
+  }
+  
+  .form-row {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    gap: 1rem;
+  }
+  
+  .form-row > .input {
+    flex: 1; /* Make them share space */
+  }
+  /* Give the skill select more space */
+  .form-row select[name="skill_id"] {
+    flex: 2;
+    min-width: 200px;
+  }
+  
+  .form-error {
+    color: var(--destructive);
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }

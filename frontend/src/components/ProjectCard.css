@@ -1,37 +1,64 @@
+/* ProjectCard.css */
 .project-card {
-    border: 1px solid #ddd;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 8px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  
-  .project-card h3 {
-    margin-top: 0;
-  }
-  
-  .project-creator {
-    font-style: italic;
-    color: #555;
-    font-size: 0.9rem;
-  }
-  
-  .project-status {
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .details-button {
-    display: inline-block;
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-  }
-  
-  .details-button:hover {
-    background-color: #0056b3;
-  }
+  /* Use the .card styles */
+  background-color: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem; /* More spacing */
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+
+.project-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+
+.project-card h3 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.project-creator {
+  font-style: italic;
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.project-status {
+  font-weight: 500;
+  color: var(--foreground);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.project-card p {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: var(--muted-foreground);
+}
+
+.details-button {
+  /* Style this like a primary button */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.25rem;
+  padding: 0.6rem 1rem;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  text-decoration: none;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.details-button:hover {
+  opacity: 0.9;
+  text-decoration: none;
+}

@@ -1,7 +1,10 @@
+// homepage.jsx
+// Make sure to import the new CSS file
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import ProjectCard from '../components/ProjectCard';
 import LoadingSpinner from '../components/LoadingSpinner';
+import './HomePage.css'; // <-- IMPORT NEW CSS
 
 const HomePage = () => {
   const [projects, setProjects] = useState([]);
@@ -24,11 +27,13 @@ const HomePage = () => {
   }, []);
 
   if (loading) return <LoadingSpinner />;
-  if (error) return <p style={{ color: 'red' }}>{error}</p>;
+  if (error) return <p style={{ color: 'var(--destructive)' }}>{error}</p>;
 
   return (
     <div className="page-container">
       <h1>All Projects</h1>
+      
+      {/* This class from HomePage.css will create the responsive grid */}
       <div className="projects-list">
         {projects.length > 0 ? (
           projects.map((project) => (

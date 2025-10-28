@@ -1,0 +1,21 @@
+/* HomePage.css */
+
+.projects-list {
+    display: grid;
+    grid-template-columns: 1fr; /* 1 column on mobile */
+    gap: 1.5rem;
+  }
+  
+  /* On medium screens, go to 2 columns */
+  @media (min-width: 640px) {
+    .projects-list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  /* On large screens, go to 3 columns */
+  @media (min-width: 960px) {
+    .projects-list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }

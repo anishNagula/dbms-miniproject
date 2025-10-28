@@ -1,45 +1,58 @@
+/* Navbar.css */
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #242424;
-    padding: 1rem 2rem;
-    color: white;
-  }
-  
-  .navbar-brand a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 1.5rem;
-  }
-  
-  .navbar-links {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-  }
-  
-  .navbar-links a, .navbar-links span {
-    color: white;
-    text-decoration: none;
-  }
-  
-  .navbar-links a:hover {
-    text-decoration: underline;
-  }
-  
-  .logout-button {
-    background: none;
-    border: 1px solid #f64c72;
-    color: #f64c72;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-  }
-  
-  .logout-button:hover {
-    background-color: #f64c72;
-    color: white;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--background); /* Dark */
+  color: var(--primary-foreground); /* Light text */
+  padding: 1rem 2rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.navbar-brand a {
+  color: var(--foreground);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.navbar-links a,
+.navbar-links span {
+  color: var(--foreground);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.navbar-links span {
+  color: beige;
+}
+
+.navbar-links a:hover {
+  text-decoration: none;
+  color: var(--muted-foreground); /* Fade on hover */
+}
+
+.logout-button {
+  /* This is a "destructive" action button */
+  background: none;
+  border: 1px solid var(--destructive);
+  color: var(--destructive);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: var(--destructive);
+  color: var(--destructive-foreground); /* White text */
+}
