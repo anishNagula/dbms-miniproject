@@ -221,6 +221,23 @@ const getMyParticipatingProjects = async (req, res) => {
   }
 };
 
+// @desc    Get a user's full profile details
+// @route   GET /api/users/profile/details
+// @access  Private
+const getUserProfileDetails = async (req, res) => {
+  const student_id = req.user.student_id;
+  try {
+    // Call the new SQL Function 'CountUserSkills'
+    const query = "SELECT project_completed_count, CountUserSkills(?) AS total_skills FROM Student WHERE student_id = ?;";
+    const [details] = await pool.query(query, [student_id, student_id]);
+
+    res.status(200).json(details[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error fetching profile details' });
+  }
+};
+
 
 module.exports = {
   registerUser,
@@ -232,4 +249,5 @@ module.exports = {
   removeUserSkill,
   getMyCreatedProjects,
   getMyParticipatingProjects,
+  getUserProfileDetails,
 };

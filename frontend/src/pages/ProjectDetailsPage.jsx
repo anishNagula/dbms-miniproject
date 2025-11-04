@@ -1,11 +1,9 @@
-// projectdetailspage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
-import TeamChat from '../components/TeamChat';
 import { useAuth } from '../context/AuthContext';
-import './ProjectDetailsPage.css'; // <-- IMPORT THE NEW CSS
+import TeamChat from '../components/TeamChat';
 
 const ProjectDetailsPage = () => {
   const { id } = useParams();
@@ -13,17 +11,12 @@ const ProjectDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const { user } = useAuth();
-  
-  // These booleans are now safe to calculate after project loads
-  const isOwner = user && project && user.student_id === project.created_student_id;
-  const isTeamMember = user && project && project.teamMembers.some(member => member.student_id === user.student_id);
-  const canApply = user && !isOwner && !isTeamMember;
+  const { user } = useAuth(); // Get the current logged-in user
 
   useEffect(() => {
     const fetchProjectDetails = async () => {
       try {
-        setLoading(true);
+        setLoading(true); // Ensure loading is true at the start of fetch
         const response = await api.get(`/projects/${id}`);
         setProject(response.data);
       } catch (err) {
@@ -32,91 +25,85 @@ const ProjectDetailsPage = () => {
         setLoading(false);
       }
     };
+
     fetchProjectDetails();
   }, [id]);
 
   const handleApply = async () => {
     setMessage('');
-    setError('');
     try {
       await api.post(`/projects/${id}/apply`);
       setMessage('Application submitted successfully!');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to apply.');
+      setMessage(err.response?.data?.message || 'Failed to apply.');
     }
   };
 
+  // --- START OF FIX ---
+  // 1. All loading and error checks must happen FIRST.
   if (loading) return <LoadingSpinner />;
-  if (error) return <p className="form-message form-message-error">{error}</p>;
-  if (!project) return <p>Project not found.</p>;
+  if (error) return <p style={{ color: 'red' }}>{error}</p>;
+  if (!project) return <p>Project not found.</p>; // This prevents any null access
+
+  // 2. All this logic is now MOVED to AFTER the guards above.
+  // We can be 100% sure that 'project' is not null here.
+  const isOwner = user && user.student_id === project.created_student_id;
+  const isInTeam = user && project.teamMembers.some(member => member.student_id === user.student_id);
+  const isTeamMember = isOwner || isInTeam;
+  const canApply = user && !isOwner && !isInTeam;
+  // --- END OF FIX ---
 
   return (
     <div className="page-container">
-      <div className="project-header">
-        <h2>{project.title}</h2>
-        
-        <div className="project-header-actions">
-          {canApply && (
-            <button onClick={handleApply} className="btn btn-primary">
-              Apply to this Project
-            </button>
-          )}
+      <h2>{project.title}</h2>
+      
+      {canApply && (
+        <button onClick={handleApply} style={{ marginBottom: '1rem' }}>
+          Apply to this Project
+        </button>
+      )}
 
-          {isOwner && (
-            <Link to={`/projects/${id}/edit`} className="btn btn-warning">
-              Edit Project
-            </Link>
-          )}
-        </div>
+      {isOwner && (
+        <Link to={`/projects/${id}/edit`}>
+          <button style={{ marginBottom: '1rem', backgroundColor: '#ffc107' }}>
+            Edit Project
+          </button>
+        </Link>
+      )}
+      
+      {message && <p style={{ color: message.includes('successfully') ? 'green' : 'red' }}>{message}</p>}
+      
+      <p><strong>Status:</strong> {project.status_name}</p>
+      <p><strong>Created by:</strong> {project.creator_fname} {project.creator_lname}</p>
+      
+      <h3>Description</h3>
+      <p>{project.description}</p>
 
-        {message && <p className="form-message form-message-success">{message}</p>}
-        {/* We reuse the error state for application errors */}
-        {error && <p className="form-message form-message-error">{error}</p>}
-        
-        <div className="project-meta">
-          <p><strong>Status:</strong> {project.status_name}</p>
-          <p><strong>Created by:</strong> {project.creator_fname} {project.creator_lname}</p>
-        </div>
-      </div>
+      <h3>Required Skills</h3>
+      <ul>
+        {project.requiredSkills.map((skill, index) => (
+          <li key={index}>
+            {skill.skill_name} ({skill.required_proficiency})
+          </li>
+        ))}
+      </ul>
 
-      <div className="project-section">
-        <h3>Description</h3>
-        <p>{project.description}</p>
-      </div>
-
-      <div className="project-section">
-        <h3>Required Skills</h3>
-        <ul className="detail-list">
-          {project.requiredSkills.map((skill, index) => (
-            <li key={index}>
-              {skill.skill_name} ({skill.required_proficiency})
+      <h3>Team Members</h3>
+       {project.teamMembers.length > 0 ? (
+        <ul>
+          {project.teamMembers.map((member) => (
+            <li key={member.student_id}>
+              {member.f_name} {member.l_name} - {member.role}
             </li>
           ))}
         </ul>
-      </div>
+      ) : <p>No team members yet.</p>}
 
-      <div className="project-section">
-        <h3>Team Members</h3>
-        {project.teamMembers.length > 0 ? (
-          <ul className="detail-list">
-            {project.teamMembers.map((member) => (
-              <li key={member.student_id}>
-                {member.f_name} {member.l_name} - <strong>{member.role}</strong>
-              </li>
-            ))}
-          </ul>
-        ) : <p>No team members yet.</p>}
-      </div>
-      
-      {/* <hr> is styled by globals.css */}
-      <hr /> 
-      
+      <hr style={{ margin: '2rem 0' }} />
       {isTeamMember ? (
         <TeamChat projectId={id} />
       ) : (
-        <div className="team-chat-gate">
-          <p>You must be a member of the project team to view the chat.</p>
-        </div>
+        <p>You must be a member of the project team to view the chat.</p>
       )}
     </div>
   );
