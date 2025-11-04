@@ -1,9 +1,8 @@
-// profilepage.jsx
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
-import './ProfilePage.css'; // <-- IMPORT THE NEW CSS
+import './ProfilePage.css';
 
 const ProfilePage = () => {
   const { user } = useAuth();
@@ -71,7 +70,7 @@ const ProfilePage = () => {
   return (
     <div className="page-container">
       <h2>My Profile</h2>
-      <div className="profile-card" style={{ background: '#fff', padding: '2rem', borderRadius: '8px' }}>
+      <div className="profile-card">
         <h3>{user.f_name} {user.l_name}</h3>
         <p><strong>Email:</strong> {user.email}</p>
         <p><strong>Role:</strong> {user.role}</p>
@@ -81,15 +80,15 @@ const ProfilePage = () => {
         <p><strong>Total Skills:</strong> {profileData.total_skills}</p>
         {/* --- END DEMO VALUES --- */}
 
-        <hr style={{ margin: '2rem 0' }} />
+        <hr className="profile-divider" />
 
         <h3>My Skills</h3>
         {mySkills.length > 0 ? (
-          <ul style={{ listStyle: 'none', padding: 0 }}>
+          <ul className="skills-list">
             {mySkills.map(skill => (
-              <li key={skill.skill_id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem', borderBottom: '1px solid #eee' }}>
+              <li key={skill.skill_id} className="skill-item">
                 <span>{skill.skill_name} ({skill.proficiency})</span>
-                <button onClick={() => handleRemoveSkill(skill.skill_id)} style={{ background: '#dc3545', fontSize: '0.8rem' }}>Remove</button>
+                <button onClick={() => handleRemoveSkill(skill.skill_id)} className="remove-skill-btn">Remove</button>
               </li>
             ))}
           </ul>
@@ -97,25 +96,25 @@ const ProfilePage = () => {
           <p>You have not added any skills yet.</p>
         )}
 
-        <h3 style={{ marginTop: '2rem' }}>Add a New Skill</h3>
+        <h3 className="add-skill-heading">Add a New Skill</h3>
         <form onSubmit={handleAddSkill}>
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <select value={selectedSkill} onChange={e => setSelectedSkill(e.target.value)} style={{ flex: 2, padding: '0.5rem' }}>
+          <div className="add-skill-form-group">
+            <select value={selectedSkill} onChange={e => setSelectedSkill(e.target.value)} className="skill-select">
               {allSkills.map(skill => (
                 <option key={skill.skill_id} value={skill.skill_id}>
                   {skill.skill_name}
                 </option>
               ))}
             </select>
-            <select value={selectedProficiency} onChange={e => setSelectedProficiency(e.target.value)} style={{ flex: 1, padding: '0.5rem' }}>
+            <select value={selectedProficiency} onChange={e => setSelectedProficiency(e.target.value)} className="proficiency-select">
               <option value="Beginner">Beginner</option>
               <option value="Intermediate">Intermediate</option>
               <option value="Advanced">Advanced</option>
               <option value="Expert">Expert</option>
             </select>
           </div>
-          <button type="submit" style={{ marginTop: '1rem', width: '100%' }}>Add Skill</button>
-          {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
+          <button type="submit" className="add-skill-btn">Add Skill</button>
+          {error && <p className="profile-error">{error}</p>}
         </form>
       </div>
     </div>
