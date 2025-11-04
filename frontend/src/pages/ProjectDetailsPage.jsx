@@ -2,22 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useAuth } from '../context/AuthContext';
 import TeamChat from '../components/TeamChat';
-import { useAuth } from '../context/AuthContext'; // Import useAuth
 
 const ProjectDetailsPage = () => {
   const { id } = useParams();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [message, setMessage] = useState(''); // For success/error messages
+  const [message, setMessage] = useState('');
   const { user } = useAuth(); // Get the current logged-in user
-  const isOwner = user && project && user.student_id === project.created_student_id;
-  const isTeamMember = isOwner || (user && project?.teamMembers.some(member => member.student_id === user.student_id));
 
   useEffect(() => {
     const fetchProjectDetails = async () => {
       try {
+        setLoading(true); // Ensure loading is true at the start of fetch
         const response = await api.get(`/projects/${id}`);
         setProject(response.data);
       } catch (err) {
@@ -40,16 +39,24 @@ const ProjectDetailsPage = () => {
     }
   };
 
+  // --- START OF FIX ---
+  // 1. All loading and error checks must happen FIRST.
   if (loading) return <LoadingSpinner />;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
-  if (!project) return <p>Project not found.</p>;
+  if (!project) return <p>Project not found.</p>; // This prevents any null access
 
-  // Determine if the "Apply" button should be shown
-  const canApply = user && !isOwner && !isTeamMember;
+  // 2. All this logic is now MOVED to AFTER the guards above.
+  // We can be 100% sure that 'project' is not null here.
+  const isOwner = user && user.student_id === project.created_student_id;
+  const isInTeam = user && project.teamMembers.some(member => member.student_id === user.student_id);
+  const isTeamMember = isOwner || isInTeam;
+  const canApply = user && !isOwner && !isInTeam;
+  // --- END OF FIX ---
 
   return (
     <div className="page-container">
       <h2>{project.title}</h2>
+      
       {canApply && (
         <button onClick={handleApply} style={{ marginBottom: '1rem' }}>
           Apply to this Project
@@ -57,13 +64,13 @@ const ProjectDetailsPage = () => {
       )}
 
       {isOwner && (
-          <Link to={`/projects/${id}/edit`}>
-            <button style={{ marginBottom: '1rem', backgroundColor: '#ffc107' }}>
-              Edit Project
-            </button>
-          </Link>
-        )}
-
+        <Link to={`/projects/${id}/edit`}>
+          <button style={{ marginBottom: '1rem', backgroundColor: '#ffc107' }}>
+            Edit Project
+          </button>
+        </Link>
+      )}
+      
       {message && <p style={{ color: message.includes('successfully') ? 'green' : 'red' }}>{message}</p>}
       
       <p><strong>Status:</strong> {project.status_name}</p>
@@ -91,7 +98,7 @@ const ProjectDetailsPage = () => {
           ))}
         </ul>
       ) : <p>No team members yet.</p>}
-      
+
       <hr style={{ margin: '2rem 0' }} />
       {isTeamMember ? (
         <TeamChat projectId={id} />

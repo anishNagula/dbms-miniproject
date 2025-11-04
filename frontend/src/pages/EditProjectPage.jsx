@@ -1,3 +1,4 @@
+// editprojectpage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -14,7 +15,7 @@ const EditProjectPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // 1. Fetch the project's current data to fill the form
+  // ... (useEffect logic remains the same)
   useEffect(() => {
     const fetchProject = async () => {
       try {
@@ -34,7 +35,7 @@ const EditProjectPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 2. Handle the update submission
+  // ... (handleSubmit logic remains the same)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -51,45 +52,60 @@ const EditProjectPage = () => {
   return (
     <div className="page-container">
       <h2>Edit Project</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="title">Project Title</label>
-        <input
-          type="text"
-          id="title"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          required
-        />
+      
+      {/* Use the .card and .form-container utility classes */}
+      <form onSubmit={handleSubmit} className="card form-container">
         
-        <label htmlFor="description">Project Description</label>
-        <textarea
-          id="description"
-          name="description"
-          value={formData.description}
-          rows="6"
-          onChange={handleChange}
-          required
-          style={{ padding: '0.75rem', border: '1px solid #ccc', borderRadius: '4px', fontFamily: 'inherit' }}
-        ></textarea>
+        {/* Use .form-group for proper spacing and labels */}
+        <div className="form-group">
+          <label htmlFor="title">Project Title</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+            className="input" // <-- USE CLASS
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="description">Project Description</label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            rows="6"
+            onChange={handleChange}
+            required
+            className="input" // <-- USE CLASS
+          ></textarea>
+        </div>
 
-        <label htmlFor="status_id">Project Status</label>
-        <select
-          id="status_id"
-          name="status_id"
-          value={formData.status_id}
-          onChange={handleChange}
-          style={{ padding: '0.75rem', border: '1px solid #ccc', borderRadius: '4px' }}
-        >
-          {/* In a real app, you might fetch these from the DB */}
-          <option value="1">Open for Applications</option>
-          <option value="2">In Progress</option>
-          <option value="3">Completed</option>
-          <option value="4">On Hold</option>
-        </select>
+        <div className="form-group">
+          <label htmlFor="status_id">Project Status</label>
+          {/* Use .input class on <select> */}
+          <select
+            id="status_id"
+            name="status_id"
+            value={formData.status_id}
+            onChange={handleChange}
+            className="input" // <-- USE CLASS
+          >
+            <option value="1">Open for Applications</option>
+            <option value="2">In Progress</option>
+            <option value="3">Completed</option>
+            <option value="4">On Hold</option>
+          </select>
+        </div>
 
-        <button type="submit">Update Project</button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {/* Use .btn utility classes */}
+        <button type="submit" className="btn btn-primary">
+          Update Project
+        </button>
+        
+        {error && <p style={{ color: 'var(--destructive)' }}>{error}</p>}
       </form>
     </div>
   );

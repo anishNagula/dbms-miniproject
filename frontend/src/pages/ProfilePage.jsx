@@ -1,40 +1,43 @@
+// profilepage.jsx
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
+import './ProfilePage.css'; // <-- IMPORT THE NEW CSS
 
 const ProfilePage = () => {
-  const { user } = useAuth(); // Get logged-in user info
+  const { user } = useAuth();
+  const [profileData, setProfileData] = useState({ project_completed_count: 0, total_skills: 0 });
   const [mySkills, setMySkills] = useState([]);
   const [allSkills, setAllSkills] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // State for the "Add Skill" form
   const [selectedSkill, setSelectedSkill] = useState('');
   const [selectedProficiency, setSelectedProficiency] = useState('Beginner');
   const [error, setError] = useState('');
 
-  // Fetch all data on component mount
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [mySkillsRes, allSkillsRes] = await Promise.all([
-          api.get('/users/profile/skills'), // Get my skills
-          api.get('/skills')                // Get master list of skills
-        ]);
-        setMySkills(mySkillsRes.data);
-        setAllSkills(allSkillsRes.data);
-        // Set default for the dropdown
-        if (allSkillsRes.data.length > 0) {
-          setSelectedSkill(allSkillsRes.data[0].skill_id);
-        }
-      } catch (err) {
-        setError('Failed to load profile data.');
-      } finally {
-        setLoading(false);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [detailsRes, mySkillsRes, allSkillsRes] = await Promise.all([
+        api.get('/users/profile/details'), // Get details from our new endpoint
+        api.get('/users/profile/skills'),
+        api.get('/skills')
+      ]);
+      setProfileData(detailsRes.data);
+      setMySkills(mySkillsRes.data);
+      setAllSkills(allSkillsRes.data);
+      if (allSkillsRes.data.length > 0) {
+        setSelectedSkill(allSkillsRes.data[0].skill_id);
       }
-    };
+    } catch (err) {
+      setError('Failed to load profile data.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -46,9 +49,8 @@ const ProfilePage = () => {
         skill_id: selectedSkill,
         proficiency: selectedProficiency
       });
-      // Refresh the list of my skills
-      const mySkillsRes = await api.get('/users/profile/skills');
-      setMySkills(mySkillsRes.data);
+      // Refresh all data
+      fetchData();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to add skill.');
     }
@@ -57,8 +59,8 @@ const ProfilePage = () => {
   const handleRemoveSkill = async (skillId) => {
     try {
       await api.delete(`/users/profile/skills/${skillId}`);
-      // Refresh by filtering the skill out of the local state
-      setMySkills(mySkills.filter(skill => skill.skill_id !== skillId));
+      // Refresh all data
+      fetchData();
     } catch (err) {
       setError('Failed to remove skill.');
     }
@@ -73,6 +75,11 @@ const ProfilePage = () => {
         <h3>{user.f_name} {user.l_name}</h3>
         <p><strong>Email:</strong> {user.email}</p>
         <p><strong>Role:</strong> {user.role}</p>
+        
+        {/* --- DEMO VALUES --- */}
+        <p><strong>Projects Completed:</strong> {profileData.project_completed_count}</p>
+        <p><strong>Total Skills:</strong> {profileData.total_skills}</p>
+        {/* --- END DEMO VALUES --- */}
 
         <hr style={{ margin: '2rem 0' }} />
 

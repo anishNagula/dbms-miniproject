@@ -1,0 +1,78 @@
+/* ProjectDetailsPage.css */
+
+.project-header {
+    margin-bottom: 2rem;
+  }
+  
+  .project-header-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .project-meta {
+    margin-top: 1rem;
+  }
+  
+  .project-meta p {
+    color: var(--foreground);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  .project-meta p strong {
+    color: var(--muted-foreground);
+    font-weight: 500;
+    margin-right: 0.5rem;
+  }
+  
+  .project-section {
+    margin-top: 2.5rem;
+  }
+  
+  .project-section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* For success/error messages */
+  .form-message {
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+  }
+  .form-message-success {
+    background-color: hsl(145, 63%, 94%); /* Light green */
+    color: hsl(145, 63%, 22%);
+    border-color: hsl(145, 63%, 80%);
+  }
+  .form-message-error {
+    background-color: hsl(350, 100%, 97%); /* Light red */
+    color: var(--destructive);
+    border-color: var(--destructive);
+  }
+  
+  /* For the skills and team lists */
+  .detail-list {
+    list-style: disc;
+    padding-left: 1.5rem;
+  }
+  .detail-list li {
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+  }
+  
+  /* A gate for non-team-members */
+  .team-chat-gate {
+    text-align: center;
+    padding: 2.5rem 2rem;
+    background-color: var(--accent);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    color: var(--muted-foreground);
+  }
