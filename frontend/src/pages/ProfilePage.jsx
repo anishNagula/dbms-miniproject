@@ -13,13 +13,14 @@ const ProfilePage = () => {
   
   const [selectedSkill, setSelectedSkill] = useState('');
   const [selectedProficiency, setSelectedProficiency] = useState('Beginner');
+  const [selectedRating, setSelectedRating] = useState(2.5); // <-- NEW STATE for rating
   const [error, setError] = useState('');
 
   const fetchData = async () => {
     try {
       setLoading(true);
       const [detailsRes, mySkillsRes, allSkillsRes] = await Promise.all([
-        api.get('/users/profile/details'), // Get details from our new endpoint
+        api.get('/users/profile/details'),
         api.get('/users/profile/skills'),
         api.get('/skills')
       ]);
@@ -46,9 +47,9 @@ const ProfilePage = () => {
     try {
       await api.post('/users/profile/skills', {
         skill_id: selectedSkill,
-        proficiency: selectedProficiency
+        proficiency: selectedProficiency,
+        rating: selectedRating // <-- PASS THE RATING
       });
-      // Refresh all data
       fetchData();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to add skill.');
@@ -58,7 +59,6 @@ const ProfilePage = () => {
   const handleRemoveSkill = async (skillId) => {
     try {
       await api.delete(`/users/profile/skills/${skillId}`);
-      // Refresh all data
       fetchData();
     } catch (err) {
       setError('Failed to remove skill.');
@@ -75,10 +75,8 @@ const ProfilePage = () => {
         <p><strong>Email:</strong> {user.email}</p>
         <p><strong>Role:</strong> {user.role}</p>
         
-        {/* --- DEMO VALUES --- */}
         <p><strong>Projects Completed:</strong> {profileData.project_completed_count}</p>
         <p><strong>Total Skills:</strong> {profileData.total_skills}</p>
-        {/* --- END DEMO VALUES --- */}
 
         <hr className="profile-divider" />
 
@@ -87,7 +85,12 @@ const ProfilePage = () => {
           <ul className="skills-list">
             {mySkills.map(skill => (
               <li key={skill.skill_id} className="skill-item">
-                <span>{skill.skill_name} ({skill.proficiency})</span>
+                
+                {/* --- DISPLAY THE RATING --- */}
+                <span>
+                  {skill.skill_name} ({skill.proficiency}) - <strong>{skill.rating}/5</strong>
+                </span>
+                
                 <button onClick={() => handleRemoveSkill(skill.skill_id)} className="remove-skill-btn">Remove</button>
               </li>
             ))}
@@ -96,7 +99,7 @@ const ProfilePage = () => {
           <p>You have not added any skills yet.</p>
         )}
 
-        <h3 className="add-skill-heading">Add a New Skill</h3>
+        <h3 className="add-skill-heading">Add / Update Skill</h3>
         <form onSubmit={handleAddSkill}>
           <div className="add-skill-form-group">
             <select value={selectedSkill} onChange={e => setSelectedSkill(e.target.value)} className="skill-select">
@@ -112,8 +115,20 @@ const ProfilePage = () => {
               <option value="Advanced">Advanced</option>
               <option value="Expert">Expert</option>
             </select>
+
+            {/* --- RATING INPUT FIELD --- */}
+            <input 
+              type="number"
+              value={selectedRating}
+              onChange={e => setSelectedRating(parseFloat(e.target.value))}
+              min="0"
+              max="5"
+              step="0.5"
+              className="rating-input"
+            />
+
           </div>
-          <button type="submit" className="add-skill-btn">Add Skill</button>
+          <button type="submit" className="add-skill-btn">Add / Update Skill</button>
           {error && <p className="profile-error">{error}</p>}
         </form>
       </div>

@@ -118,7 +118,7 @@ const getUserSkills = async (req, res) => {
   const student_id = req.user.student_id;
   try {
     const query = `
-      SELECT s.skill_id, s.skill_name, ss.proficiency 
+      SELECT s.skill_id, s.skill_name, ss.proficiency, ss.rating 
       FROM Student_Skills AS ss
       JOIN Skills AS s ON ss.skill_id = s.skill_id
       WHERE ss.student_id = ?;
@@ -131,29 +131,38 @@ const getUserSkills = async (req, res) => {
   }
 };
 
-// @desc    Add a skill to a user's profile
+// @desc    Add or update a skill on a user's profile
 // @route   POST /api/users/profile/skills
 // @access  Private
 const addUserSkill = async (req, res) => {
   const student_id = req.user.student_id;
-  const { skill_id, proficiency } = req.body;
+  const { skill_id, proficiency, rating } = req.body; // <-- Added rating
 
-  if (!skill_id || !proficiency) {
-    return res.status(400).json({ message: 'Skill ID and proficiency are required' });
+  if (!skill_id || !proficiency || rating === undefined) {
+    return res.status(400).json({ message: 'Skill ID, proficiency, and rating are required' });
+  }
+
+  if (rating < 0 || rating > 5) {
+    return res.status(400).json({ message: 'Rating must be between 0 and 5' });
   }
 
   try {
-    await pool.query(
-      'INSERT INTO Student_Skills (student_id, skill_id, proficiency) VALUES (?, ?, ?)',
-      [student_id, skill_id, proficiency]
-    );
-    res.status(201).json({ message: 'Skill added successfully' });
+    // This query will INSERT a new row, or UPDATE the existing row
+    // if a duplicate key (student_id, skill_id) is found.
+    const query = `
+      INSERT INTO Student_Skills (student_id, skill_id, proficiency, rating) 
+      VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        proficiency = VALUES(proficiency),
+        rating = VALUES(rating);
+    `;
+
+    await pool.query(query, [student_id, skill_id, proficiency, rating]);
+    res.status(201).json({ message: 'Skill added/updated successfully' });
+
   } catch (error) {
-    if (error.code === 'ER_DUP_ENTRY') {
-      return res.status(400).json({ message: 'You already have this skill' });
-    }
     console.error(error);
-    res.status(500).json({ message: 'Server error adding skill' });
+    res.status(500).json({ message: 'Server error adding or updating skill' });
   }
 };
 
